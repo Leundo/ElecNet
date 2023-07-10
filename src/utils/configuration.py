@@ -3,7 +3,14 @@
 # Epo 2, batch 64, pos 200. TAcc: 0.9988, TRec: 0.4865
 # Epo 15, batch 64, pos 10, lr 0.001. TAcc: 0.9979, TRec: 0.8459
 # Epo 55, batch 64, pos 10, lr 0.0001. TAcc: 0.9976, TRec: 0.8498
-# Epo 106, batch 64, pos 10, lr 0.0001. TAcc: 0.9962, TRec: 0.9981
+
+# Epo 106, batch 64, pos 10, lr 0.0001, seed 0. TAcc: 0.9962, TRec: 0.9981
+# Epo 288, batch 64, pos 10, lr 0.0001, seed 2. TAcc: 0.9982, TRec: 0.9702
+# Epo 111, batch 64, pos 10, lr 0.0001, seed 3. TAcc: 0.9979, TRec: 0.9995
+# Epo 160, batch 64, pos 10, lr 0.0001, seed 4. TAcc: 0.9982, TRec: 0.9909
+# Epo 162, batch 64, pos 10, lr 0.0001, seed 5. TAcc: 0.9988, TRec: 0.9701
+
+
 elec_mlp_config = {
     'embedding': {
         'hidden_counts': [128, 128],

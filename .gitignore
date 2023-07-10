@@ -7,7 +7,7 @@
 # production
 /dist
 /data
-
+/images
 
 # misc
 .DS_Store

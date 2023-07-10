@@ -15,7 +15,7 @@ from src.models.manet import MANet
 parser = argparse.ArgumentParser()
 parser.add_argument('--lr', type=float, default=0.0001)
 parser.add_argument('--epoch', type=int, default=500)
-parser.add_argument('--seed', type=int, default=0)
+parser.add_argument('--seed', type=int, default=5)
 parser.add_argument('--batch', type=int, default=64)
 parser.add_argument('--pos-weight', type=int, default=10)
 parser.add_argument('--train-scale', type=float, default=0.7)
@@ -94,8 +94,8 @@ for epoch in range(0, args.epoch):
         train_loss_list.append(loss.item())
         # print(loss.item())
 
-    print('Epo:\t{}\nLos:\t{}\nAcc:\t{}\nRec:\t{}'.format(epoch, sum(train_loss_list) / len(train_loss_list),
-          train_accuracy_numerator / train_accuracy_denominator, train_recall_numerator / train_recall_denominator))
+    print('Epo:\t{}\tLos:\t{}\tAcc:\t{}\tRec:\t{}'.format(epoch, '%.8f' % (sum(train_loss_list) / len(train_loss_list)),
+          '%.4f' % (train_accuracy_numerator / train_accuracy_denominator), '%.4f' % (train_recall_numerator / train_recall_denominator)))
 
     test_accuracy_numerator = 0
     test_accuracy_denominator = 0
@@ -103,7 +103,8 @@ for epoch in range(0, args.epoch):
     test_recall_denominator = 0
     test_loss_list = []
     manet.eval()
-    for feature, label in tqdm(test_loader):
+    for feature, label in test_loader:
+    # for feature, label in tqdm(test_loader):
         action_label = label.to(device)
         chuanlian_feature = feature[Equipment.chuanlian.value].to(device)
         rongkang_feature = feature[Equipment.rongkang.value].to(device)
@@ -128,5 +129,5 @@ for epoch in range(0, args.epoch):
                 (prediction[mask] == action_label[mask]).sum())
             test_recall_denominator += int(mask.sum())
 
-    print('TAcc:\t{}\nTRec:\t{}'.format(test_accuracy_numerator /
-          test_accuracy_denominator, test_recall_numerator / test_recall_denominator))
+    print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /
+          test_accuracy_denominator), '%.6f' % (test_recall_numerator / test_recall_denominator)))

@@ -62,7 +62,7 @@ for epoch in range(0, args.epoch):
             prediction = torch.where(F.sigmoid(result) >= 0.5, 1.0, 0.0)
             accuracy = int((prediction == action_label).sum()) / action_label.numel()
             recall = int((prediction[mask] == action_label[mask]).sum()) / int(mask.sum())
-            print('Acc:\t{}\nRec:\t{}'.format(accuracy, recall))
+            print('Acc:\t{}\nRec:\t{}'.format('%.4f' % accuracy, '%.4f' % recall))
         loss.backward()
         optimizer.step()
         
