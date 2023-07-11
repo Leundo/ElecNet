@@ -10,6 +10,7 @@
 # Epo 160, batch 64, pos 10, lr 0.0001, seed 4. TAcc: 0.9982, TRec: 0.9909
 # Epo 162, batch 64, pos 10, lr 0.0001, seed 5. TAcc: 0.9988, TRec: 0.9701
 
+# 20230710 Epo 164, batch 64, pos 10, lr 0.0001, seed 0. TAcc: 0.9965, TRec: 0.9972
 
 elec_mlp_config = {
     'embedding': {

@@ -14,6 +14,7 @@ class HydraulicPress:
     def __init__(self, taipu: str, prefix: str):
         self.random_state = 0
         self.taipu = taipu
+        self.prefix = prefix
         if taipu == 'celue':
             self.data = load_celue(prefix)
             self.data = self.data.reshape([self.data.shape[0], -1])
@@ -36,8 +37,8 @@ class HydraulicPress:
             )
             
     @staticmethod
-    def get_k(matrix: List[float], bw: float = 0.1):
-        tmp = np.array(matrix).reshape(-1, 3).T
+    def get_k(matrix: List[float], dim: int = 3, bw: float = 0.1):
+        tmp = np.array(matrix).reshape(-1, dim).T
         k = gaussian_kde(tmp, bw_method=bw)(tmp)
         return k 
     
@@ -48,11 +49,12 @@ class HydraulicPress:
         
         tsned_min, tsned_max = tsned_data.min(0), tsned_data.max(0)
         tsned_norm = (tsned_data - tsned_min) / (tsned_max - tsned_min)
-                   
-        plt.scatter(tsned_norm[:,0], tsned_norm[:,1])
+        
+        k = HydraulicPress.get_k(tsned_norm, dim=2)
+        plt.scatter(tsned_norm[:,0], tsned_norm[:,1], c=k)
         plt.xticks([])
         plt.yticks([])
-        plt.savefig(os.path.join(image_folder_path, 'pca_2d_{}.png'.format(self.taipu)))
+        plt.savefig(os.path.join(image_folder_path, 'pca_2d_{}_{}.png'.format(self.taipu, self.prefix)))
         
     # https://stackoverflow.com/questions/53826201/how-to-represent-density-information-on-a-matplotlib-3-d-scatter-plot
     def pca_3d(self):
@@ -67,7 +69,7 @@ class HydraulicPress:
         ax = fig.add_subplot(111, projection='3d')
         k = HydraulicPress.get_k(tsned_norm)
         ax.scatter(tsned_norm[:,0], tsned_norm[:,1], tsned_norm[:,2], c=k, alpha=0.2)
-        plt.savefig(os.path.join(image_folder_path, 'pca_3d_{}.png'.format(self.taipu)))
+        plt.savefig(os.path.join(image_folder_path, 'pca_3d_{}_{}.png'.format(self.taipu, self.prefix)))
         
         # fig = plt.figure()
         # ax = fig.add_subplot(projection='3d')
@@ -82,6 +84,8 @@ class HydraulicPress:
 if __name__ == '__main__':
     # press = HydraulicPress('celue', '20230704')
     press = HydraulicPress('input', '20230704')
+    # press = HydraulicPress('celue', '20230710')
+    # press = HydraulicPress('input', '20230710')
 
     # press.pca_2d()
     press.pca_3d()

@@ -13,9 +13,9 @@ from src.models.manet import MANet
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--lr', type=float, default=0.0001)
+parser.add_argument('--lr', type=float, default=0.0005)
 parser.add_argument('--epoch', type=int, default=500)
-parser.add_argument('--seed', type=int, default=5)
+parser.add_argument('--seed', type=int, default=1)
 parser.add_argument('--batch', type=int, default=64)
 parser.add_argument('--pos-weight', type=int, default=10)
 parser.add_argument('--train-scale', type=float, default=0.7)
@@ -32,7 +32,7 @@ pos_weight = torch.tensor([args.pos_weight]).to(device)
 criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight, reduction='mean')
 optimizer = torch.optim.Adam(manet.parameters(), lr=args.lr)
 
-dataset = ActionDatasetV0('20230704')
+dataset = ActionDatasetV0('20230710')
 train_size = int(len(dataset) * args.train_scale)
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = torch.utils.data.random_split(
