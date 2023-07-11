@@ -15,9 +15,9 @@ from src.models.manet import MANet
 parser = argparse.ArgumentParser()
 parser.add_argument('--lr', type=float, default=0.0001)
 parser.add_argument('--epoch', type=int, default=500)
-parser.add_argument('--seed', type=int, default=0)
+parser.add_argument('--seed', type=int, default=11)
 parser.add_argument('--batch', type=int, default=64)
-parser.add_argument('--pos-weight', type=int, default=10)
+parser.add_argument('--pos-weight', type=int, default=15)
 parser.add_argument('--train-scale', type=float, default=0.7)
 
 args = parser.parse_args()

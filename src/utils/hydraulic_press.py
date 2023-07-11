@@ -53,7 +53,7 @@ class HydraulicPress:
         tsned_norm = (tsned_data - tsned_min) / (tsned_max - tsned_min)
         
         k = HydraulicPress.get_k(tsned_norm, dim=2)
-        plt.scatter(tsned_norm[:,0], tsned_norm[:,1], c=k)
+        plt.scatter(tsned_norm[:,0], tsned_norm[:,1], c=k, alpha=0.01)
         plt.xticks([])
         plt.yticks([])
         plt.savefig(os.path.join(image_folder_path, 'pca_2d_{}_{}.png'.format(self.taipu, self.prefix)))
@@ -70,7 +70,7 @@ class HydraulicPress:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         k = HydraulicPress.get_k(tsned_norm)
-        ax.scatter(tsned_norm[:,0], tsned_norm[:,1], tsned_norm[:,2], c=k, alpha=0.2)
+        ax.scatter(tsned_norm[:,0], tsned_norm[:,1], tsned_norm[:,2], c=k, alpha=0.1)
         plt.savefig(os.path.join(image_folder_path, 'pca_3d_{}_{}.png'.format(self.taipu, self.prefix)))
         
         # fig = plt.figure()
@@ -87,8 +87,8 @@ if __name__ == '__main__':
     # press = HydraulicPress('celue', '20230704')
     # press = HydraulicPress('input', '20230704')
     # press = HydraulicPress('celue', '20230710')
-    # press = HydraulicPress('input', '20230710')
-    press = HydraulicPress('guzhang', '20230710')
+    press = HydraulicPress('input', '20230710')
+    # press = HydraulicPress('guzhang', '20230710')
 
-    # press.pca_2d()
-    press.pca_3d()
+    press.pca_2d()
+    # press.pca_3d()
