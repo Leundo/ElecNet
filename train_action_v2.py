@@ -13,9 +13,9 @@ from src.models.manet import MANet
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--lr', type=float, default=0.0005)
+parser.add_argument('--lr', type=float, default=0.0001)
 parser.add_argument('--epoch', type=int, default=500)
-parser.add_argument('--seed', type=int, default=1)
+parser.add_argument('--seed', type=int, default=0)
 parser.add_argument('--batch', type=int, default=64)
 parser.add_argument('--pos-weight', type=int, default=10)
 parser.add_argument('--train-scale', type=float, default=0.7)
@@ -39,9 +39,9 @@ train_dataset, test_dataset = torch.utils.data.random_split(
     dataset, [train_size, test_size])
 
 train_loader = DataLoader(
-    train_dataset, batch_size=args.batch, shuffle=False, num_workers=0)
+    train_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
 test_loader = DataLoader(
-    test_dataset, batch_size=args.batch, shuffle=False, num_workers=0)
+    test_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
 
 
 @torch.no_grad()

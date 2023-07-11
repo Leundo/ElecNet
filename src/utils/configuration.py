@@ -191,3 +191,65 @@ elec_mlp_config = {
 #         'should_normalize': True,
 #     },
 # }
+
+
+# elec_mlp_config = {
+#     'embedding': {
+#         'hidden_counts': [32, 32],
+#         'output_count': 32,
+#         'should_normalize': True,
+#         'chuanlian': {
+#             'channel_count': 11,
+#             'input_count': 6,
+#         },
+#         'rongkang': {
+#             'channel_count': 3257,
+#             'input_count': 6,
+#         },
+#         'bianya': {
+#             'channel_count': 3279,
+#             'input_count': 2,
+#         },
+#         'xiandian': {
+#             'channel_count': 7661,
+#             'input_count': 8,
+#         },
+#         'jiaoxian': {
+#             'channel_count': 3830,
+#             'input_count': 2,
+#         },
+#         'fuhe': {
+#             'channel_count': 6044,
+#             'input_count': 5,
+#         },
+#         'fadian': {
+#             'channel_count': 1935,
+#             'input_count': 8,
+#         },
+#         'muxian': {
+#             'channel_count': 5870,
+#             'input_count': 6,
+#         },
+#         'changzhan': {
+#             'channel_count': 1684,
+#             'input_count': 1,
+#         },
+#     },
+#     'guzhang': {
+#         'output_count': 34,
+#     },
+#     'status': {
+#         'input_count': 32 * 9,
+#         'hidden_counts': [256, 128],
+#         'channel_count': None,
+#         'output_count': 32,
+#         'should_normalize': True,
+#     },
+#     'classification': {
+#         'input_count': 32 + 32,
+#         'hidden_counts': [64, 32],
+#         'channel_count': 3619,
+#         'output_count': 2,
+#         'should_normalize': True,
+#     },
+# }
