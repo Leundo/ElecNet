@@ -49,6 +49,17 @@ def save_celue_text_to_np(prefix: str) -> np.ndarray:
     return label
 
 
+def save_guzhang_text_to_np(prefix: str) -> np.ndarray:
+    file_path = os.path.join(text_folder_path, '%s_guzhang.txt' % prefix)
+    with open(os.path.join(file_path), 'r') as fp:
+        list = [[float(x) for x in line.rstrip().split(' ')] for line in fp]
+    output_count = elec_mlp_config['guzhang']['output_count']
+    feature = np.asarray(list).astype('float32').reshape(
+        (-1, output_count))
+    np.save(os.path.join(np_folder_path, '{}_guzhang.npy'.format(
+        prefix)), feature)
+    return feature
+
 def load_equipment(equipment: Equipment, prefix: str) -> np.ndarray:
     file_path = os.path.join(
         np_folder_path, '{}_{}.npy'.format(prefix, equipment.value))
@@ -57,4 +68,8 @@ def load_equipment(equipment: Equipment, prefix: str) -> np.ndarray:
 
 def load_celue(prefix: str) -> np.ndarray:
     file_path = os.path.join(np_folder_path, '%s_celue.npy' % prefix)
+    return np.load(file_path)
+
+def load_guzhang(prefix: str) -> np.ndarray:
+    file_path = os.path.join(np_folder_path, '%s_guzhang.npy' % prefix)
     return np.load(file_path)

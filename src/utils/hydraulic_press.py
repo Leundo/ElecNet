@@ -8,7 +8,7 @@ from scipy.stats import gaussian_kde
 from src.utils.constant import image_folder_path
 
 from src.utils.equipment import Equipment
-from src.utils.porter import load_equipment, load_celue
+from src.utils.porter import load_equipment, load_celue, load_guzhang
 
 class HydraulicPress:
     def __init__(self, taipu: str, prefix: str):
@@ -18,6 +18,8 @@ class HydraulicPress:
         if taipu == 'celue':
             self.data = load_celue(prefix)
             self.data = self.data.reshape([self.data.shape[0], -1])
+        elif taipu == 'guzhang':
+            self.data = load_guzhang(prefix)
         elif taipu == 'input':
             chuanlian = load_equipment(Equipment.chuanlian, prefix)
             count = chuanlian.shape[0]
@@ -83,9 +85,10 @@ class HydraulicPress:
     
 if __name__ == '__main__':
     # press = HydraulicPress('celue', '20230704')
-    press = HydraulicPress('input', '20230704')
+    # press = HydraulicPress('input', '20230704')
     # press = HydraulicPress('celue', '20230710')
     # press = HydraulicPress('input', '20230710')
+    press = HydraulicPress('guzhang', '20230710')
 
     # press.pca_2d()
     press.pca_3d()

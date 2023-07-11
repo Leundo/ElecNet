@@ -54,6 +54,9 @@ elec_mlp_config = {
             'input_count': 1,
         },
     },
+    'guzhang': {
+        'output_count': 34,
+    },
     'status': {
         'input_count': 128 * 9,
         'hidden_counts': [512, 256],
