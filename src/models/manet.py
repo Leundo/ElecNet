@@ -61,3 +61,27 @@ class MANet(nn.Module):
         ), 2)
         
         return self.classification_net(status_and_embedding)
+
+    def forward_to_get_status_embedding(self, chuanlian_feature: torch.Tensor, rongkang_feature: torch.Tensor, binya_feature: torch.Tensor, xiandian_feature: torch.Tensor, jiaoxian_feature: torch.Tensor, fuhe_feature: torch.Tensor, fadian_feature: torch.Tensor, muxian_feature: torch.Tensor, changzhan_feature: torch.Tensor) -> torch.Tensor:
+        chuanlian_embedding = self.chuanlian_embedding_net(chuanlian_feature)
+        rongkang_embedding = self.rongkang_embedding_net(rongkang_feature)
+        binya_embedding = self.binya_embedding_net(binya_feature)
+        xiandian_embedding = self.xiandian_embedding_net(xiandian_feature)
+        jiaoxian_embedding = self.jiaoxian_embedding_net(jiaoxian_feature)
+        fuhe_embedding = self.fuhe_embedding_net(fuhe_feature)
+        fadian_embedding = self.fadian_embedding_net(fadian_feature)
+        muxian_embedding = self.muxian_embedding_net(muxian_feature)
+        changzhan_embedding = self.changzhan_embedding_net(changzhan_feature)
+        
+        concat_aggregation_embedding = torch.cat((
+            torch.sum(chuanlian_embedding, dim=1),
+            torch.sum(rongkang_embedding, dim=1),
+            torch.sum(binya_embedding, dim=1),
+            torch.sum(xiandian_embedding, dim=1),
+            torch.sum(jiaoxian_embedding, dim=1),
+            torch.sum(fuhe_embedding, dim=1),
+            torch.sum(fadian_embedding, dim=1),
+            torch.sum(muxian_embedding, dim=1),
+            torch.sum(changzhan_embedding, dim=1)
+        ), 1)
+        return self.status_net(concat_aggregation_embedding)

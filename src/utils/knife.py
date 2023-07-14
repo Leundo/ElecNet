@@ -3,10 +3,14 @@ from typing import List
 
 import numpy as np
 import torch
+import time
 
 
 def fold(l: List, n: int) -> List:
     return [l[i:i+n] for i in range(0, len(l), n)]
+
+def get_timestr() -> str:
+    return time.strftime("%Y-%m-%d|%H:%M:%S", time.localtime()) 
 
 
 def setup_seed(seed: int = 3407):
