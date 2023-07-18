@@ -42,7 +42,7 @@ for index in range(celue.shape[0]):
 # np.save(os.path.join(data_folder_path, 'np', '%s_celue_taipu.npy' % data_prefix), celue_taipu)
 
 
-cluster_count = 3
+cluster_count = 40
 counter = Counter(celue_str)
 most_common_keys = [item[0] for item in counter.most_common()[0:cluster_count-1]]
 celue_taipu = []
@@ -55,5 +55,6 @@ for index in range(celue.shape[0]):
     else:
         celue_taipu.append(cluster_count-1)
         
+
 celue_taipu = np.asarray(celue_taipu)
 np.save(os.path.join(data_folder_path, 'np', '%s_celue_taipu.npy' % data_prefix), celue_taipu)

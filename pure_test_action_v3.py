@@ -37,7 +37,7 @@ manet.load_state_dict(torch.load(
 manet.to(device)
 manet.eval()
 
-data_prefix = '20230710'
+data_prefix = '20230718'
 dataset = ActionDatasetV0(data_prefix)
 train_size = int(len(dataset) * args.train_scale)
 test_size = len(dataset) - train_size
@@ -59,9 +59,6 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
     test_recall_denominator = 0
     test_loss_list = []
 
-    status_embedding = None
-    celue_for_0_label = None
-
     # for feature, label in loader:
     for feature, label in tqdm(loader):
         action_label = label.to(device)
@@ -75,13 +72,6 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
         muxian_feature = feature[Equipment.muxian.value].to(device)
         changzhan_feature = feature[Equipment.changzhan.value].to(device)
         
-        if celue_for_0_label is None:
-            celue_for_0_label = action_label[:, :, 0]
-        else:
-            celue_for_0_label = torch.cat((
-                celue_for_0_label,
-                action_label[:, :, 0],
-            ), 0)
 
         with torch.no_grad():
             result = manet(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
@@ -96,67 +86,13 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
                 (prediction[mask] == action_label[mask]).sum())
             test_recall_denominator += int(mask.sum())
 
-        with torch.no_grad():
-            current_status_embedding = manet.forward_to_get_status_embedding(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
-                                                                     jiaoxian_feature, fuhe_feature, fadian_feature, muxian_feature, changzhan_feature)
-            if status_embedding is None:
-                status_embedding = current_status_embedding
-            else:
-                status_embedding = torch.cat((
-                    status_embedding,
-                    current_status_embedding,
-                ), 0)
                 
 
 
     print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /
                                                   test_accuracy_denominator), '%.6f' % (test_recall_numerator / test_recall_denominator)))
     
-    return status_embedding, celue_for_0_label
+    return
 
-def get_bound_input(loader: DataLoader) -> torch.Tensor:
-    bound_input = None
-    for feature, label in tqdm(loader):
-        chuanlian_feature = feature[Equipment.chuanlian.value]
-        rongkang_feature = feature[Equipment.rongkang.value]
-        binya_feature = feature[Equipment.bianya.value]
-        xiandian_feature = feature[Equipment.xiandian.value]
-        jiaoxian_feature = feature[Equipment.jiaoxian.value]
-        fuhe_feature = feature[Equipment.fuhe.value]
-        fadian_feature = feature[Equipment.fadian.value]
-        muxian_feature = feature[Equipment.muxian.value]
-        changzhan_feature = feature[Equipment.changzhan.value]
-        
-        count = chuanlian_feature.shape[0]
-        current_input = torch.cat((
-            chuanlian_feature.reshape([count, -1]),
-            rongkang_feature.reshape([count, -1]),
-            binya_feature.reshape([count, -1]),
-            xiandian_feature.reshape([count, -1]),
-            jiaoxian_feature.reshape([count, -1]),
-            fuhe_feature.reshape([count, -1]),
-            fadian_feature.reshape([count, -1]),
-            muxian_feature.reshape([count, -1]),
-            changzhan_feature.reshape([count, -1]),
-        ), 1)
-        
-        if bound_input is None:
-            bound_input = current_input
-        else:
-            bound_input = torch.cat((
-                bound_input,
-                current_input,
-            ), 0)
-    return bound_input
+test(all_loader)
 
-
-# status_embedding, celue_for_0_label = test(all_loader)
-# status_embedding = status_embedding.to(torch.device('cpu'))
-# celue_for_0_label = celue_for_0_label.to(torch.device('cpu'))
-
-# np.save(os.path.join(data_folder_path, 'np', '%s_status.npy' % data_prefix), status_embedding.numpy())
-# np.save(os.path.join(data_folder_path, 'np', '%s_celue_for_0.npy' % data_prefix), celue_for_0_label.numpy())
-
-
-bound_input = get_bound_input(all_loader)
-np.save(os.path.join(data_folder_path, 'np', '%s_bound_input.npy' % data_prefix), bound_input.numpy())

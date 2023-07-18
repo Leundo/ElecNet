@@ -26,6 +26,9 @@ class HydraulicPress:
             self.label = np.load(os.path.join(data_folder_path, 'np', '%s_celue_taipu.npy' % prefix))
         elif taipu == 'celue_for_0':
             self.data = np.load(os.path.join(data_folder_path, 'np', '%s_celue_for_0.npy' % prefix))
+        elif taipu == 'bound_input':
+            self.data = np.load(os.path.join(data_folder_path, 'np', '%s_bound_input.npy' % prefix))
+            self.label = np.load(os.path.join(data_folder_path, 'np', '%s_celue_taipu.npy' % prefix))
         elif taipu == 'input':
             chuanlian = load_equipment(Equipment.chuanlian, prefix)
             count = chuanlian.shape[0]
@@ -144,11 +147,12 @@ if __name__ == '__main__':
     # press = HydraulicPress('input', '20230710')
     # press = HydraulicPress('guzhang', '20230710')
     
-    press = HydraulicPress('status', '20230710')
+    # press = HydraulicPress('status', '20230710')
+    press = HydraulicPress('bound_input', '20230710')
     # press = HydraulicPress('celue_for_0', '20230710')
 
     # press.pca_2d(alpha=0.1, shouldK=False)
     # press.pca_3d(alpha=0.1, shouldK=False)
     
-    # press.pca_2d_with_label(alpha=1)
-    press.pca_3d_with_label(alpha=1)
+    press.pca_2d_with_label(alpha=1)
+    # press.pca_3d_with_label(alpha=1)
