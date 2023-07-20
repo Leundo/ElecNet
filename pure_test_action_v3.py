@@ -136,26 +136,26 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
             'prediction': [],
             'action': [],
         }
-        # 抽取预测不准确的行  
-        with torch.no_grad():
-            result = manet(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
-                           jiaoxian_feature, fuhe_feature, fadian_feature, muxian_feature, changzhan_feature)
-            x = torch.sigmoid(result)
-            mask = action_label.ge(0.5)
-            prediction = torch.where(torch.sigmoid(result) >= 0.5, 1.0, 0.0)
-            mask_indices = mask.nonzero()
+        # # 抽取预测不准确的行  
+        # with torch.no_grad():
+        #     result = manet(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
+        #                    jiaoxian_feature, fuhe_feature, fadian_feature, muxian_feature, changzhan_feature)
+        #     x = torch.sigmoid(result)
+        #     mask = action_label.ge(0.5)
+        #     prediction = torch.where(torch.sigmoid(result) >= 0.5, 1.0, 0.0)
+        #     mask_indices = mask.nonzero()
 
-            result_np = result.cpu().detach().numpy()
-            row = feature['row'].detach().numpy().tolist()
-            prediction_nonzero_indices = np.nonzero(prediction.cpu().detach().numpy())
-            prediction_nonzero_transposed = np.transpose(prediction_nonzero_indices)
-            prediction_value = result_np[prediction_nonzero_indices].reshape(-1, 1)
-            action_nonzero_transposed_list = np.transpose(np.nonzero(action_label.cpu().detach().numpy())).tolist()
-            prediction_list = np.concatenate((prediction_nonzero_transposed, prediction_value), 1).tolist()
+        #     result_np = result.cpu().detach().numpy()
+        #     row = feature['row'].detach().numpy().tolist()
+        #     prediction_nonzero_indices = np.nonzero(prediction.cpu().detach().numpy())
+        #     prediction_nonzero_transposed = np.transpose(prediction_nonzero_indices)
+        #     prediction_value = result_np[prediction_nonzero_indices].reshape(-1, 1)
+        #     action_nonzero_transposed_list = np.transpose(np.nonzero(action_label.cpu().detach().numpy())).tolist()
+        #     prediction_list = np.concatenate((prediction_nonzero_transposed, prediction_value), 1).tolist()
             
-            feeds['row'] += row
-            feeds['prediction'] += prediction_list
-            feeds['action'] += action_nonzero_transposed_list
+        #     feeds['row'] += row
+        #     feeds['prediction'] += prediction_list
+        #     feeds['action'] += action_nonzero_transposed_list
             
 
     print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /
@@ -165,8 +165,8 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
     print('TAcc1:\t{}\tTRec1:\t{}'.format('%.6f' % (test_celue_1_accuracy_numerator /
                                                   test_celue_1_accuracy_denominator), '%.6f' % (test_celue_1_recall_numerator / test_celue_1_recall_denominator)))
 
-    with open('feeds.json', 'w') as outfile:
-        json.dump(feeds, outfile, indent = 4) 
+    # with open('feeds.json', 'w') as outfile:
+    #     json.dump(feeds, outfile, indent = 4) 
 
     return
 
