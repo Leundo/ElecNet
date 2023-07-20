@@ -1,29 +1,33 @@
 import argparse
 import os
 from decimal import Decimal
-import json
 from typing import Tuple
 
-import numpy as np
 from tqdm import tqdm
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
-from src.utils.action_dataset_v0 import ActionDatasetV0, ActionDatasetV1
+from src.utils.action_dataset_v0 import ActionDatasetV0
 from src.utils.equipment import Equipment
 from src.utils.configuration import elec_mlp_config
 from src.utils.knife import setup_seed, get_timestr
-from src.utils.constant import model_folder_path, data_folder_path
+from src.utils.constant import model_folder_path
 from src.models.manet import MANet
 
+# 希望复现训练时的数据集划分
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--lr', type=float, default=0.0001)
+parser.add_argument('--epoch', type=int, default=500)
+parser.add_argument('--saved-epoch', type=int, default=61)
 parser.add_argument('--seed', type=int, default=11)
 parser.add_argument('--batch', type=int, default=64)
+parser.add_argument('--pos-weight', type=int, default=15)
+parser.add_argument('--train-scale', type=float, default=0.7)
 parser.add_argument('--model-name', type=str,
                     default='0.9986_11_15_0.0001_72_2023-07-13|16:29:46.pt')
-parser.add_argument('--train-scale', type=float, default=0.7)
 
 args = parser.parse_args()
 setup_seed(args.seed)
@@ -32,14 +36,12 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 
-manet = MANet()
-manet.load_state_dict(torch.load(
-    os.path.join(model_folder_path, args.model_name)))
-manet.to(device)
-manet.eval()
+manet = MANet().to(device)
+pos_weight = torch.tensor([args.pos_weight]).to(device)
+criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight, reduction='mean')
+optimizer = torch.optim.Adam(manet.parameters(), lr=args.lr)
 
-data_prefix = '20230718'
-dataset = ActionDatasetV1(data_prefix)
+dataset = ActionDatasetV0('20230710')
 train_size = int(len(dataset) * args.train_scale)
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = torch.utils.data.random_split(
@@ -49,9 +51,14 @@ train_loader = DataLoader(
     train_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
 test_loader = DataLoader(
     test_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
-all_loader = DataLoader(
-    dataset, batch_size=args.batch, shuffle=True, num_workers=0)
 
+manet.load_state_dict(torch.load(
+    os.path.join(model_folder_path, args.model_name)))
+manet.to(device)
+manet.eval()
+
+print(train_size)
+print(test_size)
 
 def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
     test_accuracy_numerator = 0
@@ -130,33 +137,6 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
             test_celue_1_recall_numerator += int(
                 (prediction[celue_1_mask_recall] == action_label[celue_1_mask_recall]).sum())
             test_celue_1_recall_denominator += int(celue_1_mask_recall.sum())
-        
-        feeds = {
-            'row': [],
-            'prediction': [],
-            'action': [],
-        }
-        # 抽取预测不准确的行  
-        with torch.no_grad():
-            result = manet(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
-                           jiaoxian_feature, fuhe_feature, fadian_feature, muxian_feature, changzhan_feature)
-            x = torch.sigmoid(result)
-            mask = action_label.ge(0.5)
-            prediction = torch.where(torch.sigmoid(result) >= 0.5, 1.0, 0.0)
-            mask_indices = mask.nonzero()
-
-            result_np = result.cpu().detach().numpy()
-            row = feature['row'].detach().numpy().tolist()
-            prediction_nonzero_indices = np.nonzero(prediction.cpu().detach().numpy())
-            prediction_nonzero_transposed = np.transpose(prediction_nonzero_indices)
-            prediction_value = result_np[prediction_nonzero_indices].reshape(-1, 1)
-            action_nonzero_transposed_list = np.transpose(np.nonzero(action_label.cpu().detach().numpy())).tolist()
-            prediction_list = np.concatenate((prediction_nonzero_transposed, prediction_value), 1).tolist()
-            
-            feeds['row'] += row
-            feeds['prediction'] += prediction_list
-            feeds['action'] += action_nonzero_transposed_list
-            
 
     print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /
                                                   test_accuracy_denominator), '%.6f' % (test_recall_numerator / test_recall_denominator)))
@@ -165,10 +145,8 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
     print('TAcc1:\t{}\tTRec1:\t{}'.format('%.6f' % (test_celue_1_accuracy_numerator /
                                                   test_celue_1_accuracy_denominator), '%.6f' % (test_celue_1_recall_numerator / test_celue_1_recall_denominator)))
 
-    with open('feeds.json', 'w') as outfile:
-        json.dump(feeds, outfile, indent = 4) 
-
     return
 
 
-test(all_loader)
+test(train_loader)
+test(test_loader)

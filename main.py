@@ -1,8 +1,9 @@
 import argparse
 
 import torch
+import numpy as np
 
-from src.MLP import MLP
+# from src.MLP import MLP
 
 
 parser = argparse.ArgumentParser()
@@ -18,9 +19,17 @@ args.device = device
 print(args.device)
 
 
-x = torch.randn(32, 1684, 1684).to(args.device)
+# x = torch.randn(32, 1684, 1684).to(args.device)
 
-changzhan_net = MLP(1684, num_hidden=args.hidden_size, num_channel=1684,
-                    num_output=args.embedding_size)
-changzhan_net = changzhan_net.to(args.device)
-print(changzhan_net(x).size())
+# changzhan_net = MLP(1684, num_hidden=args.hidden_size, num_channel=1684,
+#                     num_output=args.embedding_size)
+# changzhan_net = changzhan_net.to(args.device)
+# print(changzhan_net(x).size())
+
+
+celue_0_np = np.zeros(shape=(64, 3619, 1))
+celue_1_np = np.ones(shape=(64, 3619, 1))
+
+false_tensor = torch.tensor(np.zeros(shape=(64, 3619, 1)), dtype=torch.bool) 
+true_tensor = torch.tensor(np.ones(shape=(64, 3619, 1)), dtype=torch.bool) 
+
