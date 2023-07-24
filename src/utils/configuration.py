@@ -14,6 +14,11 @@
 # 20230710 Epo 25, batch 64, pos 20, lr 0.0001, seed 11. TAcc: 0.9958, TRec: 0.9986
 # 20230710 Epo 61, batch 64, pos 15, lr 0.0001, seed 11. TAcc: 0.9978, TRec: 0.9985
 
+# seed 11 lr 0.0001
+# 187 - Test:0.9373 0.9923 Train: 0.9738 0.9769
+# 200 - Test:0.9519 0.9817 Train: 0.9743 0.9722
+
+
 elec_mlp_config = {
     'embedding': {
         'hidden_counts': [128, 128],

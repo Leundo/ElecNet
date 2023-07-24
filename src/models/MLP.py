@@ -16,7 +16,7 @@ def create_miniblock(
     if channel_count is None:
         channel_count = output_count
     layers: List[nn.Module] = [nn.Linear(input_count, output_count)]
-    if should_normalize is not None:
+    if should_normalize is True:
         layers += [nn.BatchNorm1d(channel_count)]
     layers += [nn.ReLU()]
     return layers

@@ -19,7 +19,7 @@ from src.models.manet import MANet
 parser = argparse.ArgumentParser()
 parser.add_argument('--lr', type=float, default=0.0001)
 parser.add_argument('--epoch', type=int, default=500)
-parser.add_argument('--saved-epoch', type=int, default=61)
+parser.add_argument('--saved-epoch', type=int, default=180)
 parser.add_argument('--seed', type=int, default=11)
 parser.add_argument('--batch', type=int, default=64)
 parser.add_argument('--pos-weight', type=int, default=1)
@@ -143,8 +143,6 @@ for epoch in range(0, args.epoch):
             temp_signifiant_mask = signifiant_mask.expand(mask.shape[0], -1, -1)
             test_accuracy_numerator += int((prediction[temp_signifiant_mask] == action_label[temp_signifiant_mask]).sum())
             test_accuracy_denominator += action_label[temp_signifiant_mask].numel()
-            # test_accuracy_numerator += int(((prediction == action_label) * signifiant_mask).sum())
-            # test_accuracy_denominator += signifiant_mask.numel()
             test_recall_numerator += int(
                 (prediction[mask] == action_label[mask]).sum())
             test_recall_denominator += int(mask.sum())
@@ -152,9 +150,9 @@ for epoch in range(0, args.epoch):
     print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /
           test_accuracy_denominator), '%.6f' % (test_recall_numerator / test_recall_denominator)))
 
-    # if (args.saved_epoch < epoch and best_recall < test_recall_numerator / test_recall_denominator):
-    #     best_recall = test_recall_numerator / test_recall_denominator
-    #     model_name = '{}_{}_{}_{}_{}_{}.pt'.format(Decimal(best_recall).quantize(Decimal('0.0000')), args.seed, args.pos_weight, args.lr, epoch + 1, timestr)
-    #     torch.save(manet.state_dict(), os.path.join(model_folder_path, model_name))
-    #     print('Model saved in {}'.format(model_name))
+    if (args.saved_epoch < epoch and best_recall < test_recall_numerator / test_recall_denominator):
+        best_recall = test_recall_numerator / test_recall_denominator
+        model_name = '{}_{}_{}_{}_{}_{}.pt'.format(Decimal(best_recall).quantize(Decimal('0.0000')), args.seed, args.pos_weight, args.lr, epoch + 1, timestr)
+        torch.save(manet.state_dict(), os.path.join(model_folder_path, model_name))
+        print('Model saved in {}'.format(model_name))
     
