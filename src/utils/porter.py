@@ -73,3 +73,7 @@ def load_celue(prefix: str) -> np.ndarray:
 def load_guzhang(prefix: str) -> np.ndarray:
     file_path = os.path.join(np_folder_path, '%s_guzhang.npy' % prefix)
     return np.load(file_path)
+
+def load_signifiant_mask(prefix: str) -> np.ndarray:
+    file_path = os.path.join(np_folder_path, '%s_signifiant_mask.npy' % prefix)
+    return np.load(file_path)

@@ -76,9 +76,10 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
         'prediction': [],
         'action': [],
     }
+    batch_count = 0
 
     # for feature, label in loader:
-    for feature, label in tqdm(loader):
+    for (feature, label) in tqdm(loader):
         action_label = label.to(device)
         chuanlian_feature = feature[Equipment.chuanlian.value].to(device)
         rongkang_feature = feature[Equipment.rongkang.value].to(device)
@@ -142,10 +143,8 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             result = manet(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
                            jiaoxian_feature, fuhe_feature, fadian_feature, muxian_feature, changzhan_feature)
-            x = torch.sigmoid(result)
             mask = action_label.ge(0.5)
             prediction = torch.where(torch.sigmoid(result) >= 0.5, 1.0, 0.0)
-            mask_indices = mask.nonzero()
 
             result_np = result.cpu().detach().numpy()
             row = feature['row'].detach().numpy().tolist()
@@ -155,9 +154,14 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
             action_nonzero_transposed_list = np.transpose(np.nonzero(action_label.cpu().detach().numpy())).tolist()
             prediction_list = np.concatenate((prediction_nonzero_transposed, prediction_value), 1).tolist()
             
+            for index in range(len(prediction_list)):
+                prediction_list[index][0] += batch_count
+            for index in range(len(action_nonzero_transposed_list)):
+                action_nonzero_transposed_list[index][0] += batch_count
             feeds['row'] += row
             feeds['prediction'] += prediction_list
             feeds['action'] += action_nonzero_transposed_list
+            batch_count += len(row)
             
 
     print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /

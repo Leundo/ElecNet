@@ -2,7 +2,12 @@ import argparse
 import os
 from decimal import Decimal
 import json
+import math
 from typing import Tuple
+
+import numpy as np
+
+from src.utils.porter import load_equipment, load_celue
 
 def remain_guzhang_0(value):
     return value[1] < 0.5
@@ -22,6 +27,7 @@ batch_actions = [[] for _ in range(len(rows))]
 
 for prediction in predictions:
     row = rows[int(prediction[0])]
+    prediction[3] = 1 / (1 + math.e ** - prediction[3])
     batch_predictions[row].append(prediction[1:])
     
 for action in actions:
@@ -60,10 +66,17 @@ def create_recall_and_accurate_sheet():
 
         if accurate_0 < 1.0 or accurate_1 < 1.0:
             non_100_accurate_count += 1
-        # print(predictions_0)
-        # print(actions_0)
-        _ = 0
+        # elif len(actions_0) > 0 or len(actions_1) > 0:
+        #     print(index)
         
-    print('total_A:\t{}'.format(1 - non_100_accurate_count / len(rows)))
+        
+    # print('total_A:\t{}'.format(1 - non_100_accurate_count / len(rows)))
     
-create_recall_and_accurate_sheet()
+# create_recall_and_accurate_sheet()
+
+
+
+print(len(batch_actions[0]))
+print(len(batch_predictions[0]))
+print(batch_actions[0])
+print(batch_predictions[0])
