@@ -6,10 +6,11 @@ from typing import Tuple
 from tqdm import tqdm
 import numpy as np
 import torch
+import json
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
-from src.utils.action_dataset_v0 import ActionDatasetV0
+from src.utils.action_dataset_v0 import ActionDatasetV0, ActionDatasetV1
 from src.utils.equipment import Equipment
 from src.utils.configuration import elec_mlp_config
 from src.utils.knife import setup_seed, get_timestr
@@ -36,26 +37,27 @@ setup_seed(args.seed)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
-prefix = '20230710'
+prefix = '20230718'
 
-signifiant_mask = torch.from_numpy(load_signifiant_mask(prefix)).to(device)
+signifiant_mask = torch.from_numpy(load_signifiant_mask('20230710')).to(device)
 
 manet = MANet().to(device)
 pos_weight = torch.tensor([args.pos_weight]).to(device)
 criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight, reduction='none')
 optimizer = torch.optim.Adam(manet.parameters(), lr=args.lr)
 
-dataset = ActionDatasetV0(prefix)
+dataset = ActionDatasetV1(prefix)
 train_size = int(len(dataset) * args.train_scale)
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = torch.utils.data.random_split(
     dataset, [train_size, test_size])
 
-train_loader = DataLoader(
-    train_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
-test_loader = DataLoader(
-    test_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
-
+# train_loader = DataLoader(
+#     train_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
+# test_loader = DataLoader(
+#     test_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
+all_loader = DataLoader(
+    dataset, batch_size=args.batch, shuffle=True, num_workers=0)
 
 manet = MANet()
 manet.load_state_dict(torch.load(
@@ -63,8 +65,6 @@ manet.load_state_dict(torch.load(
 manet.to(device)
 manet.eval()
 
-print(train_size)
-print(test_size)
 
 @torch.no_grad()
 def test(model: torch.nn.Module, action_label: torch.Tensor, chuanlian_feature: torch.Tensor, rongkang_feature: torch.Tensor, binya_feature: torch.Tensor, xiandian_feature: torch.Tensor, jiaoxian_feature: torch.Tensor, fuhe_feature: torch.Tensor, fadian_feature: torch.Tensor, muxian_feature: torch.Tensor, changzhan_feature: torch.Tensor):
@@ -91,7 +91,12 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
     test_celue_1_recall_numerator = 0
     test_celue_1_recall_denominator = 0
     
-    train_loss_list = []
+    feeds = {
+        'row': [],
+        'prediction': [],
+        'action': [],
+    }
+    batch_count = 0
 
     for feature, label in tqdm(loader):
         action_label = label.to(device)
@@ -153,6 +158,32 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
             test_celue_1_recall_numerator += int(
                 (prediction[celue_1_mask_recall] == action_label[celue_1_mask_recall]).sum())
             test_celue_1_recall_denominator += int(celue_1_mask_recall.sum())
+            
+        with torch.no_grad():
+            result = manet(chuanlian_feature, rongkang_feature, binya_feature, xiandian_feature,
+                           jiaoxian_feature, fuhe_feature, fadian_feature, muxian_feature, changzhan_feature)
+            mask = action_label.ge(0.5)
+            prediction = torch.where(torch.sigmoid(result) >= 0.5, 1.0, 0.0)
+            
+            temp_signifiant_mask = signifiant_mask.expand(mask.shape[0], -1, -1)
+            result_np = result.cpu().detach().numpy()
+            row = feature['row'].detach().numpy().tolist()
+            prediction_nonzero_indices = np.nonzero((prediction * temp_signifiant_mask).cpu().detach().numpy())
+            prediction_nonzero_transposed = np.transpose(prediction_nonzero_indices)
+            prediction_value = result_np[prediction_nonzero_indices].reshape(-1, 1)
+            action_nonzero_transposed_list = np.transpose(np.nonzero(action_label.cpu().detach().numpy())).tolist()
+            prediction_list = np.concatenate((prediction_nonzero_transposed, prediction_value), 1).tolist()
+            
+            for index in range(len(prediction_list)):
+                prediction_list[index][0] += batch_count
+            for index in range(len(action_nonzero_transposed_list)):
+                action_nonzero_transposed_list[index][0] += batch_count
+            feeds['row'] += row
+            feeds['prediction'] += prediction_list
+            feeds['action'] += action_nonzero_transposed_list
+            batch_count += len(row)
+            
+            
 
     print('TAcc:\t{}\tTRec:\t{}'.format('%.6f' % (test_accuracy_numerator /
                                                   test_accuracy_denominator), '%.6f' % (test_recall_numerator / test_recall_denominator)))
@@ -161,9 +192,12 @@ def test(loader: DataLoader) -> Tuple[torch.Tensor, torch.Tensor]:
     print('TAcc1:\t{}\tTRec1:\t{}'.format('%.6f' % (test_celue_1_accuracy_numerator /
                                                   test_celue_1_accuracy_denominator), '%.6f' % (test_celue_1_recall_numerator / test_celue_1_recall_denominator)))
 
+    with open('feeds_v4.json', 'w') as outfile:
+        json.dump(feeds, outfile, indent = 4) 
     return
 
     
 
-test(train_loader)
-test(test_loader)
+# test(train_loader)
+# test(test_loader)
+test(all_loader)

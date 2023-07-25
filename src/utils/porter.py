@@ -2,6 +2,7 @@ import os
 
 import torch
 import numpy as np
+import json
 
 from src.utils.constant import data_folder_path
 from src.utils.knife import fold
@@ -11,7 +12,7 @@ from src.utils.equipment import Equipment
 
 text_folder_path = os.path.join(data_folder_path, 'text')
 np_folder_path = os.path.join(data_folder_path, 'np')
-
+json_folder_path = os.path.join(data_folder_path, 'json')
 
 def save_equipment_text_to_np(equipment: Equipment, prefix: str) -> np.ndarray:
     file_path = os.path.join(
@@ -77,3 +78,9 @@ def load_guzhang(prefix: str) -> np.ndarray:
 def load_signifiant_mask(prefix: str) -> np.ndarray:
     file_path = os.path.join(np_folder_path, '%s_signifiant_mask.npy' % prefix)
     return np.load(file_path)
+
+
+def load_equipment_map() -> dict:
+    file_path = os.path.join(json_folder_path, 'equipment_map.json')
+    with open(file_path, 'r') as f:
+        return json.load(f)

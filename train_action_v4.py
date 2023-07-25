@@ -98,9 +98,7 @@ for epoch in range(0, args.epoch):
             prediction = torch.where(torch.sigmoid(result) >= 0.5, 1.0, 0.0)
             
             temp_signifiant_mask = signifiant_mask.expand(mask.shape[0], -1, -1)
-            # train_accuracy_numerator += int(((prediction == action_label) * signifiant_mask).sum())
             train_accuracy_numerator += int((prediction[temp_signifiant_mask] == action_label[temp_signifiant_mask]).sum())
-            # train_accuracy_denominator += signifiant_mask.numel()
             train_accuracy_denominator += action_label[temp_signifiant_mask].numel()
             train_recall_numerator += int(
                 (prediction[mask] == action_label[mask]).sum())
