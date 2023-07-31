@@ -70,6 +70,8 @@ for action in actions:
     
 def create_recall_and_accurate_sheet():
     non_100_accurate_count = 0
+    guzhang_0_non_100_accurate_count = 0
+    guzhang_1_non_100_accurate_count = 0
     for index in range(len(rows)):
         predictions_0 = list(filter(remain_guzhang_0, batch_predictions[index]))
         predictions_1 = list(filter(remain_guzhang_1, batch_predictions[index]))
@@ -99,38 +101,53 @@ def create_recall_and_accurate_sheet():
 
         if accurate_0 < 1.0 or accurate_1 < 1.0:
             non_100_accurate_count += 1
+        if accurate_0 < 1.0:
+            guzhang_0_non_100_accurate_count += 1
+        if accurate_1 < 1.0:
+            guzhang_1_non_100_accurate_count += 1
         # elif len(actions_0) > 0 or len(actions_1) > 0:
         #     print(index)
         
         
-    # print('total_A:\t{}'.format(1 - non_100_accurate_count / len(rows)))
+    print('total_A:\t{}'.format(1 - non_100_accurate_count / len(rows)))
+    print('0_A:\t{}'.format(1 - guzhang_0_non_100_accurate_count / len(rows)))
+    print('1_A:\t{}'.format(1 - guzhang_1_non_100_accurate_count / len(rows)))
     
 create_recall_and_accurate_sheet()
 
 
-# print_all_equipment()
+print_all_equipment()
 
 # print(len(batch_actions[0]))
 # print(len(batch_predictions[0]))
-# # print(batch_actions[0])
-# # print(batch_predictions[0])
 # print_equipment_vector(batch_actions[0])
+# print('======')
 # print_equipment_vector(batch_predictions[0])
 
 
 # print(len(batch_actions[118]))
 # print(len(batch_predictions[118]))
-# # print(batch_actions[0])
-# # print(batch_predictions[0])
 # print_equipment_vector(batch_actions[118])
 # print('======')
 # print_equipment_vector(batch_predictions[118])
 
 
-print(len(batch_actions[237]))
-print(len(batch_predictions[237]))
-# print(batch_actions[237])
-# print(batch_predictions[237])
-print_equipment_vector(batch_actions[237])
+# print(len(batch_actions[237]))
+# print(len(batch_predictions[237]))
+# print_equipment_vector(batch_actions[237])
+# print('======')
+# print_equipment_vector(batch_predictions[237])
+
+
+# print(len(batch_actions[171]))
+# print(len(batch_predictions[171]))
+# print_equipment_vector(batch_actions[171])
+# print('======')
+# print_equipment_vector(batch_predictions[171])
+
+
+print(len(batch_actions[87]))
+print(len(batch_predictions[87]))
+print_equipment_vector(batch_actions[87])
 print('======')
-print_equipment_vector(batch_predictions[237])
+print_equipment_vector(batch_predictions[87])

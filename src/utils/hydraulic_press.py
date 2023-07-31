@@ -13,7 +13,7 @@ from src.utils.porter import load_equipment, load_celue, load_guzhang
 
 class HydraulicPress:
     def __init__(self, taipu: str, prefix: str):
-        self.random_state = 0
+        self.random_state = 10
         self.taipu = taipu
         self.prefix = prefix
         if taipu == 'celue':
@@ -147,8 +147,8 @@ if __name__ == '__main__':
     # press = HydraulicPress('input', '20230710')
     # press = HydraulicPress('guzhang', '20230710')
     
-    # press = HydraulicPress('status', '20230710')
-    press = HydraulicPress('bound_input', '20230710')
+    press = HydraulicPress('status', '20230710')
+    # press = HydraulicPress('bound_input', '20230710')
     # press = HydraulicPress('celue_for_0', '20230710')
 
     # press.pca_2d(alpha=0.1, shouldK=False)
