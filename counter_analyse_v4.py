@@ -10,6 +10,7 @@ import numpy as np
 
 from src.utils.porter import load_equipment, load_celue, load_signifiant_mask, load_equipment_map
 
+feeds_json_name = 'feeds_test_v4.json'
 signifiant_mask = load_signifiant_mask('20230710')
 equipment_map = load_equipment_map()
 
@@ -55,7 +56,7 @@ def print_all_equipment():
     print_equipment_vector(np.transpose(np.nonzero(signifiant_mask)).tolist())
 
 
-with open('feeds_v4.json', 'r') as f:
+with open(feeds_json_name, 'r') as f:
     feeds = json.load(f)
 
 with open('frequencies_v4.json', 'r') as f:
@@ -66,17 +67,29 @@ rows = feeds['row']
 predictions = feeds['prediction']
 actions = feeds['action']
 
-batch_predictions = [[] for _ in range(len(rows))]
-batch_actions = [[] for _ in range(len(rows))]
+batch_predictions = [[] for _ in range(max(rows) + 1)]
+batch_actions = [[] for _ in range(max(rows) + 1)]
 
-for prediction in predictions:
+# 如果是准确的行用这个
+# for prediction in predictions:
+#     row = rows[int(prediction[0])]
+#     prediction[3] = 1 / (1 + math.e ** - prediction[3])
+#     batch_predictions[row].append(prediction[1:])
+    
+# 不准确的行用这个
+
+for index, prediction in enumerate(predictions):
     row = rows[int(prediction[0])]
     prediction[3] = 1 / (1 + math.e ** - prediction[3])
     batch_predictions[row].append(prediction[1:])
 
+
 for action in actions:
     row = rows[int(action[0])]
     batch_actions[row].append(action[1:])
+    
+batch_predictions = list(filter(lambda x: len(x) > 0, batch_predictions))
+batch_actions = list(filter(lambda x: len(x) > 0, batch_actions))
 
 def check_if_belong_to_frequency(actions: List[List[int]], fingerprint: List[List[int]]) -> bool:
     if len(fingerprint) != len(actions):
