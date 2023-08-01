@@ -116,7 +116,7 @@ def create_recall_and_accurate_sheet():
 create_recall_and_accurate_sheet()
 
 
-print_all_equipment()
+# print_all_equipment()
 
 # print(len(batch_actions[0]))
 # print(len(batch_predictions[0]))
@@ -146,8 +146,14 @@ print_all_equipment()
 # print_equipment_vector(batch_predictions[171])
 
 
-print(len(batch_actions[87]))
-print(len(batch_predictions[87]))
-print_equipment_vector(batch_actions[87])
+# print(len(batch_actions[87]))
+# print(len(batch_predictions[87]))
+# print_equipment_vector(batch_actions[87])
+# print('======')
+# print_equipment_vector(batch_predictions[87])
+
+print(len(batch_actions[173]))
+print(len(batch_predictions[173]))
+print_equipment_vector(batch_actions[173])
 print('======')
-print_equipment_vector(batch_predictions[87])
+print_equipment_vector(batch_predictions[173])

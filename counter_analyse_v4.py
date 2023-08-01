@@ -11,6 +11,7 @@ import numpy as np
 from src.utils.porter import load_equipment, load_celue, load_signifiant_mask, load_equipment_map
 
 feeds_json_name = 'feeds_test_v4.json'
+# feeds_json_name = 'feeds_v4.json'
 signifiant_mask = load_signifiant_mask('20230710')
 equipment_map = load_equipment_map()
 
@@ -100,7 +101,7 @@ def check_if_belong_to_frequency(actions: List[List[int]], fingerprint: List[Lis
     return True
         
 
-def create_recall_and_accurate_sheet():
+def analyse_frequencies():
 
     accumulated_recall_0 = 0
     accumulated_recall_1 = 0
@@ -180,7 +181,9 @@ def create_recall_and_accurate_sheet():
         
         # print('{}\tR0:\t{}\tR1:\t{}\tP0:\t{}\tP1:\t{}\tA0:\t{}\tA1:\t{}\tC0:\t{}\tS0:\t{}'.format(index, '%.4f' % recall_0, '%.4f' % recall_1, '%.4f' % precision_0, '%.4f' % precision_1, '%.4f' % accuracy_0, '%.4f' % accuracy_1, count_0, '%.4f' % (count_0 / count_sum)))
         if accuracy_0 < 0.90:
-            print('{}\tR0:\t{}\tR1:\t{}\tP0:\t{}\tP1:\t{}\tA0:\t{}\tA1:\t{}\tC0:\t{}\tS0:\t{}'.format(index, '%.4f' % recall_0, '%.4f' % recall_1, '%.4f' % precision_0, '%.4f' % precision_1, '%.4f' % accuracy_0, '%.4f' % accuracy_1, count_0, '%.4f' % (count_0 / count_sum)))
+            # print('{}\tR0:\t{}\tR1:\t{}\tP0:\t{}\tP1:\t{}\tA0:\t{}\tA1:\t{}\tC0:\t{}\tS0:\t{}'.format(index, '%.4f' % recall_0, '%.4f' % recall_1, '%.4f' % precision_0, '%.4f' % precision_1, '%.4f' % accuracy_0, '%.4f' % accuracy_1, count_0, '%.4f' % (count_0 / count_sum)))
+            print('{}\tR0:\t{}\tA0:\t{}\tC0:\t{}\tS0:\t{}'.format(index, '%.4f' % recall_0, '%.4f' % accuracy_0, count_0, '%.4f' % (count_0 / count_sum)))
+          
           
 
     print('total_recall_0:\t{}'.format(accumulated_recall_0 / len(rows)))
@@ -191,36 +194,13 @@ def create_recall_and_accurate_sheet():
     print('total_accuracy_1:\t{}'.format(accumulated_accuracy_1 / len(rows)))
 
 
-def analyse_frequencies():
-    accumulated_recall_0 = 0
-    accumulated_recall_1 = 0
-    accumulated_precision_0 = 0
-    accumulated_precision_1 = 0
-    accumulated_accuracy_0 = 0
-    accumulated_accuracy_1 = 0
+# def write_sheet():
+#     for index in range(len(rows)):
     
-    for index in range(len(rows)):
-        predictions_0 = list(filter(remain_guzhang_0, batch_predictions[index]))
-        predictions_1 = list(filter(remain_guzhang_1, batch_predictions[index]))
-        actions_0 = list(filter(remain_guzhang_0, batch_actions[index]))
-        actions_1 = list(filter(remain_guzhang_1, batch_actions[index]))
-        
-        TP_0 = 0
-        TN_0 = 0
-        FP_0 = 0
-        FN_0 = 0
-        
-        TP_1 = 0
-        TN_1 = 0
-        FP_1 = 0
-        FN_1 = 0
-        
-        N_0 = 25
-        N_1 = 2
         
 
 if __name__ == '__main__':
-    create_recall_and_accurate_sheet()
+    analyse_frequencies()
 
 
 # print_all_equipment()
